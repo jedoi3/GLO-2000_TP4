@@ -27,7 +27,10 @@ class Client:
         courant. Laissé vide quand l'utilisateur n'est pas connecté.
         """
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self._socket.connect((destination, gloutils.APP_PORT))
+        try:
+            self._socket.connect((destination, gloutils.APP_PORT))
+        except (TimeoutError, InterruptedError):
+            sys.exit("Connexion au serveur impossible.")
         self._username = ""
 
     def _register(self) -> None:
@@ -38,6 +41,7 @@ class Client:
         Si la création du compte s'est effectuée avec succès, l'attribut
         `_username` est mis à jour, sinon l'erreur est affichée.
         """
+
 
     def _login(self) -> None:
         """
