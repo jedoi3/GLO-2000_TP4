@@ -52,6 +52,18 @@ class Client:
         est mis à jour, sinon l'erreur est affichée.
         """
 
+        self._username=input("Entrez un nom d'utilisateur: ")
+        self._motDePass=input("Entrez un mot de passe: ")
+
+        if(self._username and self._motDePass):
+            login = json.dumps(gloutils.GloMessage(
+                header=gloutils.Headers.AUTH_LOGIN,
+                _username=self._username,
+
+                ))
+        else:
+                print("Erreur de connexion")
+
     def _quit(self) -> None:
         """
         Préviens le serveur de la déconnexion avec l'entête `BYE` et ferme le
