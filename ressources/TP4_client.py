@@ -90,6 +90,13 @@ class Client:
 
         Affiche les statistiques à l'aide du gabarit `STATS_DISPLAY`.
         """
+        request = json.dumps(gloutils.GloMessage(
+            header=gloutils.Headers.STATS_REQUEST
+        ))
+        glosocket.send_msg(self._socket, request)
+        reply = json.loads(glosocket.recv_msg(self._socket))
+        print(gloutils.STATS_DISPLAY.format(count=reply["count"], size=reply["size"]))
+
 
     def _logout(self) -> None:
         """
@@ -97,10 +104,10 @@ class Client:
 
         Met à jour l'attribut `_username`.
         """
-        logout = json.dumps(gloutils.GloMessage(
+        logout_msg = json.dumps(gloutils.GloMessage(
             header=gloutils.Headers.AUTH_LOGOUT,
         ))
-        glosocket.send_msg(self._socket, logout)
+        glosocket.send_msg(self._socket, logout_msg)
         self._username = ""
 
     def run(self) -> None:
