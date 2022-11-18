@@ -41,6 +41,17 @@ class Client:
         Si la création du compte s'est effectuée avec succès, l'attribut
         `_username` est mis à jour, sinon l'erreur est affichée.
         """
+        self._username = input("Entrez votre nom d'utilisateur: ")
+        password = getpass.getpass("Entrez votre mot de passe: ")
+        if self._username and password:
+            register = json.dumps(gloutils.GloMessage(
+                header=gloutils.Headers.AUTH_REGISTER,
+                payload=gloutils.AuthPayload(
+                    username=self._username
+                    password = password
+            )))
+        else:
+            print("Erreur de registre ")
 
 
     def _login(self) -> None:
@@ -63,7 +74,7 @@ class Client:
                     password=password
                 )))
         else:
-                print("Erreur de connexion")
+            print("Erreur de connexion")
 
     def _quit(self) -> None:
         """
@@ -101,6 +112,30 @@ class Client:
 
         Transmet ces informations avec l'entête `EMAIL_SENDING`.
         """
+        # Récupération des données pour les champs du courriel
+
+        destination:str=input("Entrez l'adresse du destinataire: ")
+        subject:str=input("Entrez le sujet: ")
+
+        # La saisie du corps se termine par un point seul sur une ligne.
+        print("Body: (enter '.' on a single line to finish typing)")
+        body = ""
+        buffer = ""
+        while (buffer != ".\n"):
+            body += buffer
+        buffer = input() + '\n'
+
+        # Transmet ces informations avec l'entête `EMAIL_SENDING`.
+        email = json.dumps(gloutils.GloMessage(
+            header=gloutils.Headers.EMAIL_SENDING,
+            payload=gloutils.EmailPayload(
+                destination=destination,
+                subject=subject,
+                body=body
+            )))
+
+
+
 
     def _check_stats(self) -> None:
         """
