@@ -47,7 +47,7 @@ class Client:
             register = json.dumps(gloutils.GloMessage(
                 header=gloutils.Headers.AUTH_REGISTER,
                 payload=gloutils.AuthPayload(
-                    username=self._username
+                    username=self._username,
                     password = password
             )))
         else:
@@ -70,7 +70,7 @@ class Client:
             login = json.dumps(gloutils.GloMessage(
                 header=gloutils.Headers.AUTH_LOGIN,
                 payload=gloutils.AuthPayload(
-                    username=self._username
+                    username=self._username,
                     password=password
                 )))
         else:

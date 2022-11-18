@@ -49,8 +49,22 @@ class Server:
     def _accept_client(self) -> None:
         """Accepte un nouveau client."""
 
+        client_socket, _ = self.server_socket.accept()
+        # self._client_list.append(client_socket)
+
+
     def _remove_client(self, client_soc: socket.socket) -> None:
         """Retire le client des structures de données et ferme sa connexion."""
+
+        try:
+            message = glosocket.recv_msg(client_soc)
+        # Si le client s'est déconnecté, on le retire de la liste.
+        except glosocket.GLOSocketError:
+            #_remove_client_from_list(client_socket)
+            remove(client_soc)
+            client_soc.close()
+            return
+
 
     def _create_account(self, client_soc: socket.socket,
                         payload: gloutils.AuthPayload
