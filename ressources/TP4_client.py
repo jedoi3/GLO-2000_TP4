@@ -52,15 +52,16 @@ class Client:
         est mis à jour, sinon l'erreur est affichée.
         """
 
-        self._username=input("Entrez un nom d'utilisateur: ")
-        self._motDePass=input("Entrez un mot de passe: ")
+        self._username=input("Entrez votre nom d'utilisateur: ")
+        password = getpass.getpass("Entrez votre mot de passe: ")
 
-        if(self._username and self._motDePass):
+        if(self._username and password):
             login = json.dumps(gloutils.GloMessage(
                 header=gloutils.Headers.AUTH_LOGIN,
-                _username=self._username,
-
-                ))
+                payload=gloutils.AuthPayload(
+                    username=self._username
+                    password=password
+                )))
         else:
                 print("Erreur de connexion")
 
