@@ -55,11 +55,14 @@ class Server:
 
     def _remove_client(self, client_soc: socket.socket) -> None:
         """Retire le client des structures de données et ferme sa connexion."""
+
         try:
             message = glosocket.recv_msg(client_soc)
         # Si le client s'est déconnecté, on le retire de la liste.
         except glosocket.GLOSocketError:
             #_remove_client_from_list(client_socket)
+            remove(client_soc)
+            client_soc.close()
             return
 
 
