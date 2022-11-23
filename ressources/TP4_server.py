@@ -40,6 +40,19 @@ class Server:
         # self._logged_users
         # ...
 
+        #Prépare le socket du serveur `_server_socket` et le met en mode écoute.
+        self._server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self._server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self._server_socket.bind((gloutils.SERVER_HOST, gloutils.SERVER_PORT))
+        self._server_socket.listen()
+        print(f"Listening on port {self._server_socket.getsockname()[1]}")
+        return self._server_socket
+
+        #Prépare les attributs suivants:
+        self._client_socs = []
+        self._logged_users = {}
+        self._logged_users[client_soc] = username
+
     def cleanup(self) -> None:
         """Ferme toutes les connexions résiduelles."""
         for client_soc in self._client_socs:
@@ -49,8 +62,22 @@ class Server:
     def _accept_client(self) -> None:
         """Accepte un nouveau client."""
 
+        client_socket, _ = self.server_socket.accept()
+        # self._client_list.append(client_socket)
+
+
     def _remove_client(self, client_soc: socket.socket) -> None:
         """Retire le client des structures de données et ferme sa connexion."""
+
+        try:
+            message = glosocket.recv_msg(client_soc)
+        # Si le client s'est déconnecté, on le retire de la liste.
+        except glosocket.GLOSocketError:
+            #_remove_client_from_list(client_socket)
+            self.remove(client_soc)
+            client_soc.close()
+            return
+
 
     def _create_account(self, client_soc: socket.socket,
                         payload: gloutils.AuthPayload
@@ -62,6 +89,8 @@ class Server:
         associe le socket au nouvel l'utilisateur et retourne un succès,
         sinon retourne un message d'erreur.
         """
+
+
         return gloutils.GloMessage()
 
     def _login(self, client_soc: socket.socket, payload: gloutils.AuthPayload
@@ -102,6 +131,11 @@ class Server:
         Récupère le nombre de courriels et la taille du dossier et des fichiers
         de l'utilisateur associé au socket.
         """
+        # Récupère le nombre de courriels et la taille du dossier et des fichiers de l'utilisateur associé au socket.
+
+
+
+
         return gloutils.GloMessage()
 
     def _send_email(self, payload: gloutils.EmailContentPayload
@@ -117,6 +151,26 @@ class Server:
 
         Retourne un messange indiquant le succès ou l'échec de l'opération.
         """
+
+        # send email et Détermine si l'envoi est interne ou externe
+
+        if payload.recipient in self._logged_users.values():
+            # écris le message tel quel dans le dossier du destinataire.
+            gloutils.write_email(payload.recipient, payload.subject, payload.body)
+        elif payload.recipient not in self._logged_users.values():
+            # transforme le message en EmailMessage et utilise le serveur SMTP pour le relayer.
+            msg = EmailMessage()
+            msg['Subject'] = payload.subject
+            msg['From'] = gloutils.SERVER_EMAIL
+            msg['To'] = payload.recipient
+            msg.set_content(payload.body)
+            with smtplib.SMTP_SSL(gloutils.SERVER_SMTP, gloutils.SERVER_SMTP_PORT) as smtp:
+                smtp.login(gloutils.SERVER_EMAIL, gloutils.SERVER_PASSWORD)
+                smtp.send_message(msg)
+        else:
+            # place le message dans le dossier SERVER_LOST_DIR et considère l'envoi comme un échec.
+            gloutils.write_email(gloutils.SERVER_LOST_DIR, payload.subject, payload.body)
+
         return gloutils.GloMessage()
 
     def run(self):

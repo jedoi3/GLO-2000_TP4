@@ -75,7 +75,7 @@ class Client:
             login_msg = json.dumps(gloutils.GloMessage(
                 header=gloutils.Headers.AUTH_LOGIN,
                 payload=gloutils.AuthPayload(
-                    username=self._username,
+                    username=self._username
                     password=password
                 )))
             glosocket.send_msg(self._socket, login_msg)
@@ -94,6 +94,7 @@ class Client:
         glosocket.send_msg(self._socket, quit_msg)
         self._socket.close()
 
+
     def _read_email(self) -> None:
         """
         Demande au serveur la liste de ses courriels avec l'entête
@@ -107,6 +108,20 @@ class Client:
         S'il n'y a pas de courriel à lire, l'utilisateur est averti avant de
         retourner au menu principal.
         """
+
+        read_request = json.dumps(gloutils.GloMessage(
+            header=gloutils.Headers.INBOX_READING_REQUEST,
+            payload=""
+        ))
+        gloutils.SUBJECT_DISPLAY.format(number, sender, subject, date)
+        read_request= json.dumps(gloutils.GloMessage(
+            header=gloutils.Headers.INBOX_READING_CHOICE,
+            payload=""
+        ))
+        gloutils.EMAIL_DISPLAY(sender, to, subject, date, body)
+
+
+
 
     def _send_email(self) -> None:
         """
