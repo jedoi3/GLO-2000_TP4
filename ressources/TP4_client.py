@@ -41,17 +41,23 @@ class Client:
         Si la création du compte s'est effectuée avec succès, l'attribut
         `_username` est mis à jour, sinon l'erreur est affichée.
         """
-        self._username = input("Entrez votre nom d'utilisateur: ")
+        username = input("Entrez votre nom d'utilisateur: ")
         password = getpass.getpass("Entrez votre mot de passe: ")
         if self._username and password:
-            register = json.dumps(gloutils.GloMessage(
+            register_msg = json.dumps(gloutils.GloMessage(
                 header=gloutils.Headers.AUTH_REGISTER,
                 payload=gloutils.AuthPayload(
-                    username=self._username
+                    username=username,
                     password = password
             )))
+            glosocket.send_msg(self._socket, register_msg)
+            reply = json.loads(glosocket.recv_msg(self._socket))
+            #if reply["header"] != :
+            #    
         else:
-            print("Erreur de registre ")
+            print("""La création a échouée:
+ - Le nom d'utilisateur est invalide.
+ - Le mot de passe n'est pas assez sûr.""")
 
 
     def _login(self) -> None:
@@ -62,19 +68,20 @@ class Client:
         Si la connexion est effectuée avec succès, l'attribut `_username`
         est mis à jour, sinon l'erreur est affichée.
         """
-
         self._username=input("Entrez votre nom d'utilisateur: ")
         password = getpass.getpass("Entrez votre mot de passe: ")
 
         if(self._username and password):
-            login = json.dumps(gloutils.GloMessage(
+            login_msg = json.dumps(gloutils.GloMessage(
                 header=gloutils.Headers.AUTH_LOGIN,
                 payload=gloutils.AuthPayload(
-                    username=self._username
+                    username=self._username,
                     password=password
                 )))
+            glosocket.send_msg(self._socket, login_msg)
         else:
             print("Erreur de connexion")
+        
 
     def _quit(self) -> None:
         """
