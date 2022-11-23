@@ -106,7 +106,7 @@ class Client:
             header=gloutils.Headers.INBOX_READING_REQUEST,
             payload=""
         )
-        gloutils.SUBJECT_DISPLAY.format(number, sender, subject, date)
+        gloutils.SUBJECT_DISPLAY.format(number=, sender, subject, date)
         read_request= json.dumps(gloutils.GloMessage(
             header=gloutils.Headers.INBOX_READING_CHOICE,
             payload=""
