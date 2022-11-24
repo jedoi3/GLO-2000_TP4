@@ -3,7 +3,7 @@ GLO-2000 Travail pratique 4 - Serveur
 Noms et numéros étudiants:
 -Jérémy Doiron (536895119)
 -Yao Zu (536770891)
--Ferass Rezek (111224239)
+-
 -
 """
 
@@ -83,9 +83,16 @@ class Server:
         sinon retourne un message d'erreur.
         """
         # Crée un compte à partir des données du payload.
-        pattern = re.compile(r"[a-zA-Z0-9_.-]+")
-        if (pattern.search(payload.username) is not None and pattern.search(payload.password) is not None):
-            
+        valide = True
+        pattern_username = re.compile(r"[a-zA-Z0-9_.-]+")
+        if (pattern_username.search(payload.username) is not None):
+            for username in self._logged_users:
+                if (username.lower() != payload.username.lower()):
+                    valide = False
+            if (valide and len(payload.password) >= 10):
+                pattern_password = re.compile(r"(?=.*\d)(?=.*[a-z])(?=.*[A-Z])")
+                # TODO:...
+
         return gloutils.GloMessage()
 
     def _login(self, client_soc: socket.socket, payload: gloutils.AuthPayload
@@ -156,7 +163,7 @@ class Server:
         size= os.path.getsize(self._get_email_list(client_soc))
         gloutils.STATS_DISPLAY.format(number=length, size=size)
 
-        return gloutils.GloMessage(STATS_DISPLAY)
+        return gloutils.GloMessage()
 
     def _send_email(self, payload: gloutils.EmailContentPayload
                     ) -> gloutils.GloMessage:
@@ -180,22 +187,22 @@ class Server:
 
         if payload.recipient in self._logged_users.values():
             # écris le message tel quel dans le dossier du destinataire.
-            gloutils.write_email(payload.recipient, payload.subject, payload.body)
+            #gloutils.write_email(payload.recipient, payload.subject, payload.body)
             succes=True
         elif payload.recipient not in self._logged_users.values():
             # transforme le message en EmailMessage et utilise le serveur SMTP pour le relayer.
             msg = EmailMessage()
             msg['Subject'] = payload.subject
-            msg['From'] = gloutils.SERVER_EMAIL
+            #msg['From'] = gloutils.SERVER_EMAIL
             msg['To'] = payload.recipient
             msg.set_content(payload.body)
-            with smtplib.SMTP_SSL(gloutils.SERVER_SMTP, gloutils.SERVER_SMTP_PORT) as smtp:
-                smtp.login(gloutils.SERVER_EMAIL, gloutils.SERVER_PASSWORD)
-                smtp.send_message(msg)
-                succes=True
-        else:
+            #with smtplib.SMTP_SSL(gloutils.SERVER_SMTP, gloutils.SERVER_SMTP_PORT) as smtp:
+           #     smtp.login(gloutils.SERVER_EMAIL, gloutils.SERVER_PASSWORD)
+                #smtp.send_message(msg)
+                #succes=True
+        #else:
             # place le message dans le dossier SERVER_LOST_DIR et considère l'envoi comme un échec.
-            gloutils.write_email(gloutils.SERVER_LOST_DIR, payload.subject, payload.body)
+            #gloutils.write_email(gloutils.SERVER_LOST_DIR, payload.subject, payload.body)
 
 
         return gloutils.GloMessage(succes)
@@ -207,20 +214,7 @@ class Server:
             # Select readable sockets
             for waiter in waiters:
                 # Handle sockets
-                client_soc, _ = socket_serveur.accept()
-                modulus, base = _generate_modulus_base(client_soc)
-                private_key, own_pubkey = _compute_keys(modulus, base)
-                public_key = _exchange_pubkeys(own_pubkey, client_soc)
-                shared_key = _compute_shared_key(private_key, public_key, modulus)
-                print(f"Shared_key: {shared_key}")
-                client_soc.close()
                 pass
-
-
-            except Exception:
-                client_soc.close()
-
-            continue
 
 
 def _main() -> int:
