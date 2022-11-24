@@ -75,7 +75,7 @@ class Client:
             login_msg = json.dumps(gloutils.GloMessage(
                 header=gloutils.Headers.AUTH_LOGIN,
                 payload=gloutils.AuthPayload(
-                    username=self._username
+                    username=self._username,
                     password=password
                 )))
             glosocket.send_msg(self._socket, login_msg)
