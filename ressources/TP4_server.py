@@ -156,7 +156,7 @@ class Server:
         size= os.path.getsize(self._get_email_list(client_soc))
         gloutils.STATS_DISPLAY.format(number=length, size=size)
 
-        return gloutils.GloMessage(STATS_DISPLAY)
+        return gloutils.GloMessage(length,size)
 
     def _send_email(self, payload: gloutils.EmailContentPayload
                     ) -> gloutils.GloMessage:
@@ -207,6 +207,7 @@ class Server:
             # Select readable sockets
             for waiter in waiters:
                 # Handle sockets
+
                 client_soc, _ = socket_serveur.accept()
                 modulus, base = _generate_modulus_base(client_soc)
                 private_key, own_pubkey = _compute_keys(modulus, base)
