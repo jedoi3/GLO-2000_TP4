@@ -60,7 +60,7 @@ class Client:
             reply = json.loads(glosocket.recv_msg(self._socket))
             if (reply["header"] == gloutils.Headers.OK):
                 self._username = username
-            elif (reply["header"] == gloutils.Headers.ERRORR):
+            elif (reply["header"] == gloutils.Headers.ERROR):
                 print(reply["payload"])
         else:
             print("""La création a échouée:
@@ -156,10 +156,9 @@ class Client:
         Transmet ces informations avec l'entête `EMAIL_SENDING`.
         """
         # Récupération des données pour les champs du courriel
-
-        destination:str=input("Entrez l'adresse du destinataire: ")
-        subject:str=input("Entrez le sujet: ")
-
+        destination = input("Entrez l'adresse du destinataire: ")
+        subject = input("Entrez le sujet: ")
+        
         # La saisie du corps se termine par un point seul sur une ligne.
         print("Body: (enter '.' on a single line to finish typing)")
         body = ""
@@ -167,15 +166,22 @@ class Client:
         while (buffer != ".\n"):
             body += buffer
         buffer = input() + '\n'
-
+        
         # Transmet ces informations avec l'entête `EMAIL_SENDING`.
         email = json.dumps(gloutils.GloMessage(
             header=gloutils.Headers.EMAIL_SENDING,
-            payload=gloutils.EmailPayload(
+            payload=gloutils.EmailContentPayload(
+                sender="",  # TODO:...
                 destination=destination,
                 subject=subject,
-                body=body
-            )))
+                date=gloutils.get_current_utc_time(),
+                content=body
+        )))
+        reply = json.loads(glosocket.recv_msg(self._socket))
+        if (reply["header"] == gloutils.Headers.OK):
+            print("Envoi avec succès") 
+        elif (reply["header"] == gloutils.Headers.ERROR):
+            print(reply["payload"])
 
 
 
