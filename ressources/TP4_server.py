@@ -35,23 +35,16 @@ class Server:
 
         S'assure que les dossiers de données du serveur existent.
         """
-        # self._server_socket
-        # self._client_socs
-        # self._logged_users
-        # ...
-
         #Prépare le socket du serveur `_server_socket` et le met en mode écoute.
         self._server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self._server_socket.bind((gloutils.SERVER_HOST, gloutils.SERVER_PORT))
+        self._server_socket.bind(("127.0.0.1", gloutils.APP_PORT))
         self._server_socket.listen()
-        print(f"Listening on port {self._server_socket.getsockname()[1]}")
-        return self._server_socket
 
         #Prépare les attributs suivants:
         self._client_socs = []
         self._logged_users = {}
-        self._logged_users[client_soc] = username
+
 
     def cleanup(self) -> None:
         """Ferme toutes les connexions résiduelles."""
