@@ -43,7 +43,7 @@ class Client:
         """
         username = input("Entrez votre nom d'utilisateur: ")
         password = getpass.getpass("Entrez votre mot de passe: ")
-        if self._username and password:
+        if username and password:
             register_msg = json.dumps(gloutils.GloMessage(
                 header=gloutils.Headers.AUTH_REGISTER,
                 payload=gloutils.AuthPayload(
@@ -52,8 +52,10 @@ class Client:
             )))
             glosocket.send_msg(self._socket, register_msg)
             reply = json.loads(glosocket.recv_msg(self._socket))
-            #if reply["header"] != :
-            #    
+            if (reply["header"] == gloutils.Headers.OK):
+                self._username = username
+            elif (reply["header"] == gloutils.Headers.ERRORR):
+                print(reply["payload"])  # TODO: test
         else:
             print("""La création a échouée:
  - Le nom d'utilisateur est invalide.
