@@ -179,8 +179,6 @@ class Client:
             print(reply["payload"])
 
 
-
-
     def _check_stats(self) -> None:
         """
         Demande les statistiques au serveur avec l'entête `STATS_REQUEST`.
@@ -192,7 +190,10 @@ class Client:
         ))
         glosocket.send_msg(self._socket, request)
         reply = json.loads(glosocket.recv_msg(self._socket))
-        print(gloutils.STATS_DISPLAY.format(count=reply["count"], size=reply["size"]))
+        if (reply["header"] == gloutils.Headers.OK):
+            print(gloutils.STATS_DISPLAY.format(count=reply["payload"]["count"], size=reply["payload"]["size"]))
+        elif (reply["header"] == gloutils.Headers.ERROR):
+            print(reply["payload"])
 
 
     def _logout(self) -> None:
