@@ -206,7 +206,20 @@ class Server:
             # Select readable sockets
             for waiter in waiters:
                 # Handle sockets
+                client_soc, _ = socket_serveur.accept()
+                modulus, base = _generate_modulus_base(client_soc)
+                private_key, own_pubkey = _compute_keys(modulus, base)
+                public_key = _exchange_pubkeys(own_pubkey, client_soc)
+                shared_key = _compute_shared_key(private_key, public_key, modulus)
+                print(f"Shared_key: {shared_key}")
+                client_soc.close()
                 pass
+
+
+            except Exception:
+                client_soc.close()
+
+            continue
 
 
 def _main() -> int:
