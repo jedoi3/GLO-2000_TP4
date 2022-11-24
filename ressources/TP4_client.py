@@ -45,18 +45,18 @@ class Client:
         username = input("Entrez votre nom d'utilisateur: ")
         password = getpass.getpass("Entrez votre mot de passe: ")
         if (username and password):
-            register_msg = json.dumps(gloutils.GloMessage(
+            register_request = json.dumps(gloutils.GloMessage(
                 header=gloutils.Headers.AUTH_REGISTER,
                 payload=gloutils.AuthPayload(
                     username=username,
-                    password = password
+                    password=password
             )))
-            glosocket.send_msg(self._socket, register_msg)
+            glosocket.send_msg(self._socket, register_request)
             reply = json.loads(glosocket.recv_msg(self._socket))
             if (reply["header"] == gloutils.Headers.OK):
                 self._username = username
             elif (reply["header"] == gloutils.Headers.ERRORR):
-                print(reply["payload"])  # TODO: test
+                print(reply["payload"])
         else:
             print("""La création a échouée:
  - Le nom d'utilisateur est invalide.
@@ -74,18 +74,18 @@ class Client:
         username = input("Entrez votre nom d'utilisateur: ")
         password = getpass.getpass("Entrez votre mot de passe: ")
         if(username and password):
-            login_msg = json.dumps(gloutils.GloMessage(
+            login_request = json.dumps(gloutils.GloMessage(
                 header=gloutils.Headers.AUTH_LOGIN,
                 payload=gloutils.AuthPayload(
                     username=username,
                     password=password
                 )))
-            glosocket.send_msg(self._socket, login_msg)
+            glosocket.send_msg(self._socket, login_request)
             reply = json.loads(glosocket.recv_msg(self._socket))
             if (reply["header"] == gloutils.Headers.OK):
                 self._username = username
-            elif (reply["header"] == gloutils.Headers.ERRORR):
-                print(reply["payload"])  # TODO: test
+            elif (reply["header"] == gloutils.Headers.ERROR):
+                print(reply["payload"])
         else:
             print("Nom d'utilisateur ou mot de passe invalide.")
 
@@ -115,19 +115,28 @@ class Client:
         S'il n'y a pas de courriel à lire, l'utilisateur est averti avant de
         retourner au menu principal.
         """
-
         read_request = json.dumps(gloutils.GloMessage(
-            header=gloutils.Headers.INBOX_READING_REQUEST,
-            payload=""
+            header=gloutils.Headers.INBOX_READING_REQUEST
         ))
-        gloutils.SUBJECT_DISPLAY.format(number, sender, subject, date)
-        read_request= json.dumps(gloutils.GloMessage(
-            header=gloutils.Headers.INBOX_READING_CHOICE,
-            payload=""
-        ))
-        gloutils.EMAIL_DISPLAY(sender, to, subject, date, body)
-
-
+        glosocket.send_msg(self._socket, read_request)
+        read_reply = json.loads(glosocket.recv_msg(self._socket))
+        if (read_reply["header"] == gloutils.Headers.OK):
+            if (read_reply["payload"] == []):  # TODO: test
+                print("Aucun courriel à lire")
+                return
+            else:
+                for email in read_reply["payload"]:
+                    print(email)
+                choice = int(input(f"Entrez votre choix [1-{len(email)}]: "))
+                choice_request = json.dumps(gloutils.GloMessage(
+                    header=gloutils.Headers.INBOX_READING_CHOICE,
+                    payload=gloutils.EmailChoicePayload(
+                        choice=choice
+                )))
+                glosocket.send_msg(self._socket, choice_request)
+                email_reply = json.loads(glosocket.recv_msg(self._socket))
+                if (email_reply["header"] == gloutils.Headers.OK):
+                    gloutils.EMAIL_DISPLAY.format(sender=email_reply["payload"]["sender"], to=email_reply["payload"]["destination"], subject=email_reply["payload"]["subject"], date=email_reply["payload"]["date"], body=email_reply["payload"]["content"])
 
 
     def _send_email(self) -> None:
