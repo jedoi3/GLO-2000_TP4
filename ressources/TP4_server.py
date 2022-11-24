@@ -129,14 +129,14 @@ class Server:
 
         Une absence de courriel n'est pas une erreur, mais une liste vide.
         """
+        email_list = gloutils.EmailListPayload()
 
-        liste= []
-        if (liste != []):
-            for i in range(len(liste)):
-                liste[i]=gloutils.SUBJECT_DISPLAY.format(// todo)
+        if (email_list != []):
+            for i in range(len(email_list)):
+                email_list[i]=gloutils.SUBJECT_DISPLAY.format(number=i, subject=email_list[i])
         else:
-            return gloutils.GloMessage(liste)
-        return gloutils.GloMessage(liste)
+            return gloutils.GloMessage(email_list)
+        return gloutils.GloMessage(email_list)
 
     def _get_email(self, client_soc: socket.socket,
                    payload: gloutils.EmailChoicePayload
