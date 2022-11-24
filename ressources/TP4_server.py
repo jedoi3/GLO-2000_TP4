@@ -1,13 +1,8 @@
 """\
 GLO-2000 Travail pratique 4 - Serveur
 Noms et numéros étudiants:
-<<<<<<< HEAD
--Jérémy Doiron
--Yao Zu 536770891
-=======
 -Jérémy Doiron (536895119)
--
->>>>>>> ce99762c1c89810973406bb0d2244f9c7ba54136
+-Yao Zu (536770891)
 -
 """
 
@@ -117,15 +112,9 @@ class Server:
             return gloutils.GloMessage(succes)
 
 
-
-
-
-
-
     def _logout(self, client_soc: socket.socket) -> None:
         """Déconnecte un utilisateur."""
 
-        # deconnect an user
 
 
 
