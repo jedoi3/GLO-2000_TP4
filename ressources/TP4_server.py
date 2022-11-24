@@ -163,11 +163,7 @@ class Server:
         size= os.path.getsize(self._get_email_list(client_soc))
         gloutils.STATS_DISPLAY.format(number=length, size=size)
 
-<<<<<<< HEAD
         return gloutils.GloMessage()
-=======
-        return gloutils.GloMessage(length,size)
->>>>>>> 2f0a49f975bd6b2f517cf49281788469a0732f7c
 
     def _send_email(self, payload: gloutils.EmailContentPayload
                     ) -> gloutils.GloMessage:
@@ -201,7 +197,7 @@ class Server:
             msg['To'] = payload.recipient
             msg.set_content(payload.body)
             #with smtplib.SMTP_SSL(gloutils.SERVER_SMTP, gloutils.SERVER_SMTP_PORT) as smtp:
-           #     smtp.login(gloutils.SERVER_EMAIL, gloutils.SERVER_PASSWORD)
+                #smtp.login(gloutils.SERVER_EMAIL, gloutils.SERVER_PASSWORD)
                 #smtp.send_message(msg)
                 #succes=True
         #else:
@@ -218,17 +214,6 @@ class Server:
             # Select readable sockets
             for waiter in waiters:
                 # Handle sockets
-<<<<<<< HEAD
-=======
-
-                client_soc, _ = socket_serveur.accept()
-                modulus, base = _generate_modulus_base(client_soc)
-                private_key, own_pubkey = _compute_keys(modulus, base)
-                public_key = _exchange_pubkeys(own_pubkey, client_soc)
-                shared_key = _compute_shared_key(private_key, public_key, modulus)
-                print(f"Shared_key: {shared_key}")
-                client_soc.close()
->>>>>>> 2f0a49f975bd6b2f517cf49281788469a0732f7c
                 pass
 
 
