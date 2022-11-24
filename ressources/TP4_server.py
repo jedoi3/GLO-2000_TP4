@@ -107,10 +107,8 @@ class Server:
 
     def _logout(self, client_soc: socket.socket) -> None:
         """Déconnecte un utilisateur."""
-
-
-
-
+        self._logged_users.pop(client_soc)
+       # client_soc.close()
 
 
     def _get_email_list(self, client_soc: socket.socket
@@ -122,7 +120,17 @@ class Server:
 
         Une absence de courriel n'est pas une erreur, mais une liste vide.
         """
-        return gloutils.GloMessage()
+        email_list = gloutils.EmailListPayload()
+
+        if (email_list != []):
+            for i in range(len(email_list)):
+                email_list[i]=gloutils.SUBJECT_DISPLAY.format(number=i, subject=email_list[i])
+        else:
+            return gloutils.GloMessage(email_list)
+        return gloutils.GloMessage(email_list)
+
+
+
 
     def _get_email(self, client_soc: socket.socket,
                    payload: gloutils.EmailChoicePayload
@@ -144,7 +152,9 @@ class Server:
         # Récupère le nombre de courriels
         length = len(self._get_email_list(client_soc))
         size= os.path.getsize(self._get_email_list(client_soc))
-        return gloutils.GloMessage(length, size)
+        gloutils.STATS_DISPLAY.format(number=length, size=size)
+
+        return gloutils.GloMessage(STATS_DISPLAY)
 
     def _send_email(self, payload: gloutils.EmailContentPayload
                     ) -> gloutils.GloMessage:
