@@ -1,7 +1,7 @@
 """\
 GLO-2000 Travail pratique 4 - Client
 Noms et numéros étudiants:
--Jérémy Doiron
+-Jérémy Doiron (536895119)
 -
 -
 """
@@ -73,7 +73,6 @@ class Client:
         """
         username = input("Entrez votre nom d'utilisateur: ")
         password = getpass.getpass("Entrez votre mot de passe: ")
-
         if(username and password):
             login_msg = json.dumps(gloutils.GloMessage(
                 header=gloutils.Headers.AUTH_LOGIN,
