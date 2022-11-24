@@ -15,6 +15,7 @@ import select
 import smtplib
 import socket
 import sys
+import re
 
 import glosocket
 import gloutils
@@ -36,10 +37,13 @@ class Server:
         S'assure que les dossiers de données du serveur existent.
         """
         #Prépare le socket du serveur `_server_socket` et le met en mode écoute.
-        self._server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self._server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self._server_socket.bind(("127.0.0.1", gloutils.APP_PORT))
-        self._server_socket.listen()
+        try:
+            self._server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self._server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            self._server_socket.bind(("127.0.0.1", gloutils.APP_PORT))
+            self._server_socket.listen()
+        except socket.error:
+            sys.exit("Création du serveur impossible")
 
         #Prépare les attributs suivants:
         self._client_socs = []
@@ -52,24 +56,19 @@ class Server:
             client_soc.close()
         self._server_socket.close()
 
+
     def _accept_client(self) -> None:
         """Accepte un nouveau client."""
 
-        client_socket, _ = self.server_socket.accept()
-        # self._client_list.append(client_socket)
+        client_socket, _ = self._server_socket.accept()
+        self._client_socs.append(client_socket)
 
 
     def _remove_client(self, client_soc: socket.socket) -> None:
         """Retire le client des structures de données et ferme sa connexion."""
-
-        try:
-            message = glosocket.recv_msg(client_soc)
-        # Si le client s'est déconnecté, on le retire de la liste.
-        except glosocket.GLOSocketError:
-            #_remove_client_from_list(client_socket)
-            self.remove(client_soc)
-            client_soc.close()
-            return
+        if client_soc in self._client_socs:
+            self._client_socs.remove(client_soc)
+        client_soc.close()
 
 
     def _create_account(self, client_soc: socket.socket,
@@ -83,7 +82,9 @@ class Server:
         sinon retourne un message d'erreur.
         """
         # Crée un compte à partir des données du payload.
-
+        pattern = re.compile(r"[a-zA-Z0-9_.-]+")
+        if (pattern.search(payload.username) is not None and pattern.search(payload.password) is not None):
+            
         return gloutils.GloMessage()
 
     def _login(self, client_soc: socket.socket, payload: gloutils.AuthPayload
@@ -108,7 +109,7 @@ class Server:
     def _logout(self, client_soc: socket.socket) -> None:
         """Déconnecte un utilisateur."""
         self._logged_users.pop(client_soc)
-       # client_soc.close()
+        # client_soc.close()
 
 
     def _get_email_list(self, client_soc: socket.socket
