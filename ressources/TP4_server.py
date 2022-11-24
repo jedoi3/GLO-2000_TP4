@@ -2,7 +2,7 @@
 GLO-2000 Travail pratique 4 - Serveur
 Noms et numéros étudiants:
 -Jérémy Doiron
--
+-Yao Zu 536770891
 -
 """
 
@@ -101,10 +101,30 @@ class Server:
         Si les identifiants sont valides, associe le socket à l'utilisateur et
         retourne un succès, sinon retourne un message d'erreur.
         """
-        return gloutils.GloMessage()
+        succes=False
+        error_message = "Une erreur est survenue."
+        # Vérifie que les données fournies correspondent à un compte existant.
+        if payload.username in self._logged_users:
+            succes=True
+            self._logged_users[client_soc] = payload.username
+        else:
+            succes=error_message
+            return gloutils.GloMessage(succes)
+
+
+
+
+
+
 
     def _logout(self, client_soc: socket.socket) -> None:
         """Déconnecte un utilisateur."""
+
+        # deconnect an user
+
+
+
+
 
     def _get_email_list(self, client_soc: socket.socket
                         ) -> gloutils.GloMessage:
