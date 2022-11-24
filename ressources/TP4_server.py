@@ -89,7 +89,7 @@ class Server:
         associe le socket au nouvel l'utilisateur et retourne un succès,
         sinon retourne un message d'erreur.
         """
-
+        # Crée un compte à partir des données du payload.
 
         return gloutils.GloMessage()
 
@@ -124,19 +124,20 @@ class Server:
         Récupère le contenu de l'email dans le dossier de l'utilisateur associé
         au socket.
         """
-        return gloutils.GloMessage()
+
+        data= glosocket._recvall(client_soc, payload)
+
+        return gloutils.GloMessage(data)
 
     def _get_stats(self, client_soc: socket.socket) -> gloutils.GloMessage:
         """
         Récupère le nombre de courriels et la taille du dossier et des fichiers
         de l'utilisateur associé au socket.
         """
-        # Récupère le nombre de courriels et la taille du dossier et des fichiers de l'utilisateur associé au socket.
-
-
-
-
-        return gloutils.GloMessage()
+        # Récupère le nombre de courriels
+        length = len(self._get_email_list(client_soc))
+        size= os.path.getsize(self._get_email_list(client_soc))
+        return gloutils.GloMessage(length, size)
 
     def _send_email(self, payload: gloutils.EmailContentPayload
                     ) -> gloutils.GloMessage:
