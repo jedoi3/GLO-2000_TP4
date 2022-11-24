@@ -155,9 +155,14 @@ class Server:
 
         # send email et Détermine si l'envoi est interne ou externe
 
+        # succes de l'envoi
+        succes=False
+
+
         if payload.recipient in self._logged_users.values():
             # écris le message tel quel dans le dossier du destinataire.
             gloutils.write_email(payload.recipient, payload.subject, payload.body)
+            succes=True
         elif payload.recipient not in self._logged_users.values():
             # transforme le message en EmailMessage et utilise le serveur SMTP pour le relayer.
             msg = EmailMessage()
@@ -168,11 +173,13 @@ class Server:
             with smtplib.SMTP_SSL(gloutils.SERVER_SMTP, gloutils.SERVER_SMTP_PORT) as smtp:
                 smtp.login(gloutils.SERVER_EMAIL, gloutils.SERVER_PASSWORD)
                 smtp.send_message(msg)
+                succes=True
         else:
             # place le message dans le dossier SERVER_LOST_DIR et considère l'envoi comme un échec.
             gloutils.write_email(gloutils.SERVER_LOST_DIR, payload.subject, payload.body)
 
-        return gloutils.GloMessage()
+
+        return gloutils.GloMessage(succes)
 
     def run(self):
         """Point d'entrée du serveur."""
