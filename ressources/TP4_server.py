@@ -89,7 +89,7 @@ class Server:
         associe le socket au nouvel l'utilisateur et retourne un succès,
         sinon retourne un message d'erreur.
         """
-
+        # Crée un compte à partir des données du payload.
 
         return gloutils.GloMessage()
 
@@ -124,19 +124,20 @@ class Server:
         Récupère le contenu de l'email dans le dossier de l'utilisateur associé
         au socket.
         """
-        return gloutils.GloMessage()
+
+        data= glosocket._recvall(client_soc, payload)
+
+        return gloutils.GloMessage(data)
 
     def _get_stats(self, client_soc: socket.socket) -> gloutils.GloMessage:
         """
         Récupère le nombre de courriels et la taille du dossier et des fichiers
         de l'utilisateur associé au socket.
         """
-        # Récupère le nombre de courriels et la taille du dossier et des fichiers de l'utilisateur associé au socket.
-
-
-
-
-        return gloutils.GloMessage()
+        # Récupère le nombre de courriels
+        length = len(self._get_email_list(client_soc))
+        size= os.path.getsize(self._get_email_list(client_soc))
+        return gloutils.GloMessage(length, size)
 
     def _send_email(self, payload: gloutils.EmailContentPayload
                     ) -> gloutils.GloMessage:
@@ -154,9 +155,14 @@ class Server:
 
         # send email et Détermine si l'envoi est interne ou externe
 
+        # succes de l'envoi
+        succes=False
+
+
         if payload.recipient in self._logged_users.values():
             # écris le message tel quel dans le dossier du destinataire.
             gloutils.write_email(payload.recipient, payload.subject, payload.body)
+            succes=True
         elif payload.recipient not in self._logged_users.values():
             # transforme le message en EmailMessage et utilise le serveur SMTP pour le relayer.
             msg = EmailMessage()
@@ -167,11 +173,13 @@ class Server:
             with smtplib.SMTP_SSL(gloutils.SERVER_SMTP, gloutils.SERVER_SMTP_PORT) as smtp:
                 smtp.login(gloutils.SERVER_EMAIL, gloutils.SERVER_PASSWORD)
                 smtp.send_message(msg)
+                succes=True
         else:
             # place le message dans le dossier SERVER_LOST_DIR et considère l'envoi comme un échec.
             gloutils.write_email(gloutils.SERVER_LOST_DIR, payload.subject, payload.body)
 
-        return gloutils.GloMessage()
+
+        return gloutils.GloMessage(succes)
 
     def run(self):
         """Point d'entrée du serveur."""
