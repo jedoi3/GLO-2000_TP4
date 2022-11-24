@@ -1,8 +1,13 @@
 """\
 GLO-2000 Travail pratique 4 - Client
 Noms et numéros étudiants:
+<<<<<<< HEAD
 -Jérémy Doiron
 -Yao Zu 536770891
+=======
+-Jérémy Doiron (536895119)
+-
+>>>>>>> ce99762c1c89810973406bb0d2244f9c7ba54136
 -
 """
 
@@ -33,6 +38,7 @@ class Client:
             sys.exit("Connexion au serveur impossible.")
         self._username = ""
 
+
     def _register(self) -> None:
         """
         Demande un nom d'utilisateur et un mot de passe et les transmet au
@@ -43,7 +49,7 @@ class Client:
         """
         username = input("Entrez votre nom d'utilisateur: ")
         password = getpass.getpass("Entrez votre mot de passe: ")
-        if self._username and password:
+        if (username and password):
             register_msg = json.dumps(gloutils.GloMessage(
                 header=gloutils.Headers.AUTH_REGISTER,
                 payload=gloutils.AuthPayload(
@@ -52,8 +58,10 @@ class Client:
             )))
             glosocket.send_msg(self._socket, register_msg)
             reply = json.loads(glosocket.recv_msg(self._socket))
-            #if reply["header"] != :
-            #    
+            if (reply["header"] == gloutils.Headers.OK):
+                self._username = username
+            elif (reply["header"] == gloutils.Headers.ERRORR):
+                print(reply["payload"])  # TODO: test
         else:
             print("""La création a échouée:
  - Le nom d'utilisateur est invalide.
@@ -68,20 +76,24 @@ class Client:
         Si la connexion est effectuée avec succès, l'attribut `_username`
         est mis à jour, sinon l'erreur est affichée.
         """
-        self._username=input("Entrez votre nom d'utilisateur: ")
+        username = input("Entrez votre nom d'utilisateur: ")
         password = getpass.getpass("Entrez votre mot de passe: ")
-
-        if(self._username and password):
+        if(username and password):
             login_msg = json.dumps(gloutils.GloMessage(
                 header=gloutils.Headers.AUTH_LOGIN,
                 payload=gloutils.AuthPayload(
-                    username=self._username,
+                    username=username,
                     password=password
                 )))
             glosocket.send_msg(self._socket, login_msg)
+            reply = json.loads(glosocket.recv_msg(self._socket))
+            if (reply["header"] == gloutils.Headers.OK):
+                self._username = username
+            elif (reply["header"] == gloutils.Headers.ERRORR):
+                print(reply["payload"])  # TODO: test
         else:
-            print("Erreur de connexion")
-        
+            print("Nom d'utilisateur ou mot de passe invalide.")
+
 
     def _quit(self) -> None:
         """
